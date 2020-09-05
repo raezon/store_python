@@ -1,6 +1,8 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.template import loader
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+
 
 from .models import Album, Artist, Contact, Booking
 
@@ -10,14 +12,23 @@ def index(request):
     context = {'albums': albums}
     return HttpResponse(template.render(context,request=request))
     
-
 def listing(request):
-    albums = Album.objects.filter(available=True)
+    albums_list = Album.objects.filter(available=True)
+    paginator = Paginator(albums_list, 3)
+    page = request.GET.get('page')
+    try:
+        albums = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        albums = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g. 9999), deliver last page of results.
+        albums = paginator.page(paginator.num_pages)
     context = {
-        'albums': albums
+        'albums': albums,
+        'paginate':True
     }
-    template = loader.get_template('store/listing.html')
-    return HttpResponse(template.render(context,request=request))
+    return render(request, 'store/listing.html', context)
 ...
 def detail(request, album_id):
 

@@ -18,7 +18,7 @@
     {% for album in albums %}
         <div class="col-sm-4 text-center">
             <a href="{% url 'store:detail' album_id=album.id %}">
-              <img class="img-responsive" src="{{ album.picture }}" alt="{{ album.title }}">
+              <img class="img-responsive" src="{{ album.picture }}" alt="{{ album.title }}" height="500">
             </a>
             <h3><a href="{% url 'store:detail' album_id=album.id %}">{{ album.title }}</a></h3>
             {% for artist in album.artists.all %}
@@ -27,5 +27,18 @@
         </div>
         {% if forloop.counter|divisibleby:3 %}<div class="clearfix"></div>{% endif %}
     {% endfor %}
-
+    {%if paginate%}
+    <div class="clearfix"></div>
+    <nav aria-label="...">
+      <ul class="pager">
+        {% if albums.has_previous %}
+            <li><a href="?page={{ albums.previous_page_number }}">Précédent</a></li>
+        {% endif %}
+        {% if albums.has_next %}
+            <li><a href="?page={{ albums.next_page_number }}">Suivant</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
+    
 {% endif %}
